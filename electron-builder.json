@@ -1,0 +1,10 @@
+{
+  "build": {
+    "appId": "com.example.gatewaygames",
+    "productName": "Gateway Games",
+    "files": ["out/**/*", "electron-starter.js"],
+    "directories": {
+      "output": "release"
+    }
+  }
+}
