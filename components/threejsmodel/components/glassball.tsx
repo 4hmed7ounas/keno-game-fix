@@ -19,8 +19,10 @@ const GlassBall: React.FC<GlassBallProps> = ({
       <sphereGeometry args={[size, 64, 64]} />
       <meshPhysicalMaterial
         color={0xffffff}
-        metalness={0.01}
-        roughness={0.1}
+        metalness={0.5}
+        roughness={0}
+        transmission={1}
+        ior={2.33}
         transparent={true}
         opacity={0.3}
         reflectivity={1}

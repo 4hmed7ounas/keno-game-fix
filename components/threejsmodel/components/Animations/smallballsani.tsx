@@ -23,8 +23,8 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, v
           velocities[i].negate(); // Reverse the velocity
         }
 
-        ball.rotation.x += 0.3;
-        ball.rotation.y += 0.3;
+        ball.rotation.x += 0.5;
+        ball.rotation.y += 0.5;
       });
     };
 
