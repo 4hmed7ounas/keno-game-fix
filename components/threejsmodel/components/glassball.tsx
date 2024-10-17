@@ -6,6 +6,7 @@ interface GlassBallProps {
   size?: number; // Add size prop
   castShadow?: boolean; // Add props for shadowing
   receiveShadow?: boolean;
+  envMap?: THREE.Texture; // Add optional envMap prop
 }
 
 const GlassBall: React.FC<GlassBallProps> = ({
@@ -13,6 +14,7 @@ const GlassBall: React.FC<GlassBallProps> = ({
   size = 3.2, // Default size if not provided
   castShadow = false,
   receiveShadow = false,
+  envMap, // Add envMap prop
 }) => {
   return (
     <mesh position={position} castShadow={castShadow} receiveShadow={receiveShadow}>
@@ -22,14 +24,11 @@ const GlassBall: React.FC<GlassBallProps> = ({
         metalness={0.5}
         roughness={0}
         transmission={1}
-        ior={2.33}
+        ior={5.33}
         transparent={true}
         opacity={0.3}
         reflectivity={1}
-        clearcoat={1.5}
-        clearcoatRoughness={0.5}
         side={THREE.DoubleSide}
-        envMapIntensity={1.7}
       />
     </mesh>
   );

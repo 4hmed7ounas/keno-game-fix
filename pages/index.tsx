@@ -1,4 +1,5 @@
 import KenoGamePlay from "@/components/game-display";
+import GlassBall from "@/components/threejsmodel/threejsmodel";
 import GlassBallWithSmallBalls from "@/components/threejsmodel/threejsmodel";
 import { KenoPlayManagerProvider } from "@/contexts/game-managers/KenoPlayManagerContext";
 import React from "react";
@@ -19,6 +20,7 @@ function KenoGameDisplay() {
         alignItems: "center",
       }}
     >
+      {/* <GlassBall /> */}
       <GlassBallWithSmallBalls />
     </div>
   );
