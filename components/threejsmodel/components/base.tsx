@@ -1,7 +1,12 @@
-import React from 'react';
-import * as THREE from 'three';
+import React from "react";
+import * as THREE from "three";
 
-const createBaseWithHole = (outerRadius: number, innerRadius: number, height: number, choice: boolean) => {
+const createBaseWithHole = (
+  outerRadius: number,
+  innerRadius: number,
+  height: number,
+  choice: boolean,
+) => {
   const shape = new THREE.Shape();
   shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, choice);
   shape.absarc(0, 0, innerRadius, Math.PI * 2, 0, true);
@@ -16,8 +21,20 @@ const Base: React.FC<{
   innerRadius: number;
   outerRadius: number;
   choice?: boolean;
-}> = ({ positionY, color, height, innerRadius, outerRadius, choice = false }) => {
-  const baseShape = createBaseWithHole(outerRadius, innerRadius, height, choice);
+}> = ({
+  positionY,
+  color,
+  height,
+  innerRadius,
+  outerRadius,
+  choice = false,
+}) => {
+  const baseShape = createBaseWithHole(
+    outerRadius,
+    innerRadius,
+    height,
+    choice,
+  );
 
   // Extrusion settings
   const extrudeSettings = {
@@ -27,9 +44,16 @@ const Base: React.FC<{
   };
 
   return (
-    <mesh position={[0, positionY, 0]} rotation-x={Math.PI / 2} receiveShadow>
+    <mesh position={[0, positionY, 0]} rotation-x={Math.PI / 1.6} receiveShadow>
       <extrudeGeometry args={[baseShape, extrudeSettings]} />
-      <meshStandardMaterial color={color} />
+      <meshPhysicalMaterial
+        color={color}
+        metalness={0.1}
+        roughness={0.5}
+        transmission={0.2}
+        reflectivity={0.4}
+        side={THREE.DoubleSide}
+      />
     </mesh>
   );
 };

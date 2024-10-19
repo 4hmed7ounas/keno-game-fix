@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import GlassBall from "./components/glassball";
 import Base from "./components/base";
 import * as THREE from "three";
+import { gsap } from "gsap";
 import SmallBallsAnimation from "./components/Animations/smallballsani";
 
 const createCylinderMesh = (position, args, materialProps) => (
@@ -13,7 +14,7 @@ const createCylinderMesh = (position, args, materialProps) => (
 );
 
 const cylinderMaterialProps = {
-  color: 0xffffff,
+  color: 0x81847d,
   metalness: 0.8,
   roughness: 0.1,
   reflectivity: 1,
@@ -28,49 +29,9 @@ const cylinderMeshData = [
   { position: [0, 4.37, 0], args: [0.45, 0.45, 0.06, 40] },
   { position: [0, 5.3, 0], args: [0.45, 0.45, 0.06, 40] },
   { position: [0, 5.23, 0], args: [0.45, 0.45, 0.06, 40] },
-  { position: [0, 3.17, 0], args: [1, 1, 0.2, 40] },
 ];
 
-const AnimatedCamera = () => {
-  const [zoomProgress, setZoomProgress] = useState(0);
-
-  useFrame(({ camera }) => {
-    if (zoomProgress < 1) {
-      setZoomProgress((prev) => Math.min(prev + 0.01, 1));
-
-      const initialPosition = { x: 0, y: 0, z: 30 };
-      const targetPosition = { x: 0, y: 4.8, z: 3 };
-
-      const newXPosition = THREE.MathUtils.lerp(
-        initialPosition.x,
-        targetPosition.x,
-        zoomProgress,
-      );
-      const newYPosition = THREE.MathUtils.lerp(
-        initialPosition.y,
-        targetPosition.y,
-        zoomProgress,
-      );
-      const newZPosition = THREE.MathUtils.lerp(
-        initialPosition.z,
-        targetPosition.z,
-        zoomProgress,
-      );
-
-      // Cast camera to PerspectiveCamera to access fov
-      const perspectiveCamera = camera as THREE.PerspectiveCamera;
-      perspectiveCamera.position.set(newXPosition, newYPosition, newZPosition);
-      perspectiveCamera.lookAt(0, 4.8, 0);
-
-      perspectiveCamera.fov = THREE.MathUtils.lerp(75, 35, zoomProgress);
-      perspectiveCamera.updateProjectionMatrix();
-    }
-  });
-
-  return null;
-};
-
-const GlassBallWithSmallBalls = () => {
+const GlassBallWithSmallBalls = ({ cameraRef }) => {
   const [smallBalls, setSmallBalls] = useState<THREE.Mesh[]>([]);
   const [velocities, setVelocities] = useState<THREE.Vector3[]>([]);
 
@@ -114,17 +75,25 @@ const GlassBallWithSmallBalls = () => {
     setVelocities(velocitiesArray);
   }, []);
 
-  return (
-    <Canvas
-      shadows
-      camera={{ position: [0, 3.5, 9], fov: 75 }}
-      onCreated={({ gl }) => {
-        gl.setSize(window.innerWidth, window.innerHeight);
-        gl.shadowMap.enabled = true;
-      }}
-    >
-      {/* <AnimatedCamera /> */}
+  const [isZooming, setIsZooming] = useState(false);
 
+  useEffect(() => {
+    const zoomTimeout = setTimeout(() => {
+      setIsZooming(true);
+
+      gsap.to(cameraRef.current.position, {
+        x: -1, // Keep X position constant
+        y: 4.8, // Move to the target Y position
+        z: 18, // Move to the target Z position
+        duration: 2, // Duration of the zoom
+      });
+    }, 10000);
+
+    return () => clearTimeout(zoomTimeout);
+  }, [cameraRef]);
+
+  return (
+    <>
       {/* Lighting Setup */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 0, 5]} intensity={1.5} />
@@ -137,18 +106,14 @@ const GlassBallWithSmallBalls = () => {
       <pointLight position={[0, 0, 0]} intensity={2} distance={2} decay={1} />
       <pointLight position={[5, 5, 5]} intensity={2} distance={2} decay={1} />
       <pointLight position={[5, 5, 0]} intensity={2} distance={2} decay={1} />
-      <hemisphereLight
-        // skyColor={0xffffff}
-        groundColor={0x444444}
-        intensity={0.5}
-      />
+      <hemisphereLight groundColor={0x444444} intensity={0.5} />
 
       <mesh position={[0, 3.9, 0]}>
         <cylinderGeometry args={[0.26, 0.26, 0.7, 40]} />
         <meshPhysicalMaterial
           color={0xffffff}
           metalness={0.5}
-          roughness={0}
+          roughness={0.1}
           transmission={1}
           ior={5.33}
           transparent={true}
@@ -162,7 +127,21 @@ const GlassBallWithSmallBalls = () => {
         <meshPhysicalMaterial
           color={0xffffff}
           metalness={0.5}
-          roughness={0}
+          roughness={0.1}
+          transmission={1}
+          ior={5.33}
+          transparent={true}
+          opacity={0.3}
+          reflectivity={1}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      <mesh position={[0, 3.17, 0]}>
+        <cylinderGeometry args={[1, 1, 0.2, 40]} />
+        <meshPhysicalMaterial
+          color={0xffffff}
+          metalness={0.5}
+          roughness={0.1}
           transmission={1}
           ior={5.33}
           transparent={true}
@@ -181,34 +160,35 @@ const GlassBallWithSmallBalls = () => {
         size={0.57}
         castShadow={false}
         receiveShadow={false}
-        envMap={texture}
       />
-
-      <GlassBall castShadow={false} receiveShadow={false} envMap={texture} />
+      <GlassBall castShadow={false} receiveShadow={false} />
 
       {/* List of base mesh positions */}
       {[
-        [0, -2.78, 3],
-        [0.9, -2.78, 2.85],
-        [1.8, -2.78, 2.45],
-        [2.65, -2.78, 1.5],
-        [0, -2.78, -3],
-        [0.9, -2.78, -2.85],
-        [1.8, -2.78, -2.45],
-        [2.65, -2.78, -1.5],
-        [0, -2.78, 3],
-        [-0.9, -2.78, 2.85],
-        [-1.8, -2.78, 2.45],
-        [-2.65, -2.78, 1.5],
-        [0, -2.78, -3],
-        [-0.9, -2.78, -2.85],
-        [-1.8, -2.78, -2.45],
-        [-2.65, -2.78, -1.5],
-        [2.9, -2.78, 0],
-        [-2.9, -2.78, 0],
+        [0, -3.93, 2.85],
+        [0.9, -3.9, 2.75],
+        [1.8, -3.74, 2.35],
+        [2.65, -3.35, 1.4],
+        [-0.9, -3.9, 2.75],
+        [-1.8, -3.74, 2.35],
+        [-2.65, -3.35, 1.4],
+        [0, -1.6, -2.8],
+        [0.9, -1.65, -2.65],
+        [1.8, -1.84, -2.25],
+        [2.65, -2.19, -1.4],
+        [-0.9, -1.65, -2.65],
+        [-1.8, -1.84, -2.25],
+        [-2.65, -2.19, -1.4],
+        [3, -2.76, 0],
+        [-3, -2.76, 0],
       ].map((position, index) => (
-        <mesh key={index} position={position as [number, number, number]}>
-          <cylinderGeometry args={[0.1, 0.1, 0.1, 40]} />
+        <mesh
+          key={index}
+          position={position as [number, number, number]}
+          rotation={[Math.PI /5.2, 0, 0]} // Rotate around the x-axis
+          receiveShadow
+        >
+          <cylinderGeometry args={[0.15, 0.15, 0.1, 40]} />
           <meshStandardMaterial color={0xffffff} />
         </mesh>
       ))}
@@ -239,7 +219,7 @@ const GlassBallWithSmallBalls = () => {
           />
           <Base
             positionY={-2.72 - (j + 1) * 0.35 - 0.1 * (j + 1)}
-            color={0x28282b}
+            color={0x000000}
             height={0.2}
             innerRadius={2.48}
             outerRadius={3.48}
@@ -249,25 +229,39 @@ const GlassBallWithSmallBalls = () => {
 
       {/* List of centered mesh positions */}
       {[
-        [0, -3, 1],
-        [0, -3, -0.9],
-        [0.9, -3, 0],
-        [-0.9, -3, 0],
-        [0.6, -3, 0.8],
-        [-0.6, -3, 0.8],
-        [0.6, -3, -0.8],
-        [-0.6, -3, -0.8],
-        [0.3, -3, 0],
-        [-0.3, -3, 0],
+        [0, -2.3, -1.2],
+        [0, -3.09, 1.1],
+        [-1.2, -2.65, -0.2],
+        [1.2, -2.65, -0.2],
+        [0.7, -3, 0.8],
+        [-0.7, -2.95, 0.6],
+        [0.7, -2.4, -0.9],
+        [-0.7, -2.4, -0.9],
+        [0.4, -2.7, -0.1],
+        [-0.4, -2.7, -0.1],
       ].map((position, index) => (
-        <mesh key={index} position={position as [number, number, number]}>
-          <cylinderGeometry args={[0.25, 0.35, 0.7, 40]} />
-          <meshStandardMaterial color={0x000000} />
+        <mesh
+          key={index}
+          position={position as [number, number, number]}
+          rotation={[Math.PI / -1.12, 0, 0]} // Rotate around the x-axis
+          receiveShadow
+        >
+          <cylinderGeometry args={[0.27, 0.27, 0.7, 40]} />
+          <meshPhysicalMaterial
+            color={0x000000}
+            metalness={0.1}
+            roughness={0.45}
+            reflectivity={1}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       ))}
 
       {/* Centered mesh */}
       {[
+        [0, -2.45, 0],
+        [0, -2.55, 0],
+        [0, -2.65, 0],
         [0, -2.75, 0],
         [0, -2.85, 0],
         [0, -2.95, 0],
@@ -275,14 +269,23 @@ const GlassBallWithSmallBalls = () => {
         [0, -3.15, 0],
         [0, -3.25, 0],
         [0, -3.35, 0],
-        [0, -3.45, 0],
-        [0, -3.65, 0],
       ].map((position, index) => (
-        <mesh key={index} position={position as [number, number, number]}>
+        <mesh
+          key={index}
+          position={position as [number, number, number]}
+          rotation={[Math.PI / -1.12, 0, 0]} // Rotate around the x-axis
+          receiveShadow
+        >
           <cylinderGeometry
             args={[1.5 + index * 0.1, 1.6 + index * 0.1, 0.1, 40]}
           />
-          <meshStandardMaterial color={index % 2 === 0 ? 0x424540 : 0x30322f} />
+          <meshPhysicalMaterial
+            color={index % 2 === 0 ? 0x424540 : 0x30322f}
+            metalness={0.1}
+            roughness={0.48}
+            reflectivity={0.5}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       ))}
 
@@ -292,8 +295,26 @@ const GlassBallWithSmallBalls = () => {
       ))}
 
       <SmallBallsAnimation smallBalls={smallBalls} velocities={velocities} />
+    </>
+  );
+};
+
+const ThreeJSModel = () => {
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null); // Declare cameraRef here
+
+  return (
+    <Canvas
+      shadows
+      camera={{ position: [0, 0, 150], fov: 5 }}
+      onCreated={({ gl, camera }) => {
+        cameraRef.current = camera as THREE.PerspectiveCamera; // Store camera reference with type assertion
+        gl.setSize(window.innerWidth, window.innerHeight);
+        gl.shadowMap.enabled = true;
+      }}
+    >
+      <GlassBallWithSmallBalls cameraRef={cameraRef} />{" "}
     </Canvas>
   );
 };
 
-export default GlassBallWithSmallBalls;
+export default ThreeJSModel;

@@ -22,7 +22,7 @@ const GlassBall: React.FC<GlassBallProps> = ({
       <meshPhysicalMaterial
         color={0xffffff}
         metalness={0.5}
-        roughness={0}
+        roughness={0.08}
         transmission={1}
         ior={5.33}
         transparent={true}
