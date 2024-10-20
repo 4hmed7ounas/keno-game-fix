@@ -1,5 +1,5 @@
 import KenoGamePlay from "@/components/game-display";
-import MainModel from "@/components/threejsmodel/mainmodel";
+import MainModel from "@/components/main-3Dmodel/mainmodel";
 import { KenoPlayManagerProvider } from "@/contexts/game-managers/KenoPlayManagerContext";
 import React from "react";
 
