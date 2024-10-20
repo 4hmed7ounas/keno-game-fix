@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import GlassBall from "./components/glassball";
 import Base from "./components/base";
 import * as THREE from "three";
@@ -31,31 +31,19 @@ const cylinderMeshData = [
   { position: [0, 5.23, 0], args: [0.45, 0.45, 0.06, 40] },
 ];
 
+const balls = Array.from({ length: 80 }, (_, index) => index + 1);
+
 const GlassBallWithSmallBalls = ({ cameraRef }) => {
   const [smallBalls, setSmallBalls] = useState<THREE.Mesh[]>([]);
   const [velocities, setVelocities] = useState<THREE.Vector3[]>([]);
-
-  // Ensure to load the cube texture properly
-  const textureLoader = new THREE.CubeTextureLoader();
-  const texture = textureLoader.load([
-    "/assets/imgs/bg.png", // Right
-    "/assets/imgs/bg.png", // Left
-    "/assets/imgs/bg.png", // Top
-    "/assets/imgs/bg.png", // Bottom
-    "/assets/imgs/bg.png", // Back
-    "/assets/imgs/bg.png", // Front
-  ]) as THREE.CubeTexture; // Cast to CubeTexture
+  const [movingBallIndex, setMovingBallIndex] = useState(-1); // Index of the ball moving to the glass ball
+  const glassBallRef = useRef<THREE.Mesh>(null); // Ref to the glass ball
 
   useEffect(() => {
     const smallBallsArray: THREE.Mesh[] = [];
     const velocitiesArray: THREE.Vector3[] = [];
 
     for (let i = 0; i < 80; i++) {
-      const position = new THREE.Vector3(
-        (Math.random() - 0.5) * 2.6,
-        (Math.random() - 0.5) * 2.6,
-        (Math.random() - 0.5) * 2.6,
-      );
       const velocity = new THREE.Vector3(
         (Math.random() - 0.5) * 0.05,
         (Math.random() - 0.5) * 0.05,
@@ -87,10 +75,26 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
         z: 18, // Move to the target Z position
         duration: 2, // Duration of the zoom
       });
-    }, 10000);
+    }, 5000);
 
     return () => clearTimeout(zoomTimeout);
   }, [cameraRef]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * smallBalls.length);
+      setMovingBallIndex(randomIndex);
+      // Move the selected small ball to the glass ball's position
+      gsap.to(smallBalls[randomIndex].position, {
+        x: 0,
+        y: 4.8,
+        z: 0,
+        duration: 1,
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [smallBalls]);
 
   return (
     <>
@@ -185,7 +189,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
         <mesh
           key={index}
           position={position as [number, number, number]}
-          rotation={[Math.PI /5.2, 0, 0]} // Rotate around the x-axis
+          rotation={[Math.PI / 5.2, 0, 0]} // Rotate around the x-axis
           receiveShadow
         >
           <cylinderGeometry args={[0.15, 0.15, 0.1, 40]} />
@@ -294,7 +298,11 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
         <primitive key={i} object={ball} />
       ))}
 
-      <SmallBallsAnimation smallBalls={smallBalls} velocities={velocities} />
+      <SmallBallsAnimation
+        smallBalls={smallBalls}
+        velocities={velocities}
+        ballNumbers={balls}
+      />
     </>
   );
 };

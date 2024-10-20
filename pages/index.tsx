@@ -1,5 +1,6 @@
 import KenoGamePlay from "@/components/game-display";
 import GlassBall from "@/components/threejsmodel/threejsmodel";
+import SmallBall from "@/components/threejsmodel/threejsmodel";
 import ThreeJSModel from "@/components/threejsmodel/threejsmodel";
 import GlassBallWithSmallBalls from "@/components/threejsmodel/threejsmodel";
 import { KenoPlayManagerProvider } from "@/contexts/game-managers/KenoPlayManagerContext";
@@ -24,6 +25,7 @@ function KenoGameDisplay() {
       {/* <GlassBall /> */}
       {/* <GlassBallWithSmallBalls /> */}
       <ThreeJSModel />
+      {/* <SmallBall /> */}
     </div>
   );
 }
