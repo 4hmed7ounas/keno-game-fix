@@ -3,14 +3,14 @@ import * as THREE from "three";
 
 interface GlassBallProps {
   position?: THREE.Vector3;
-  size?: number; // Add size prop
-  castShadow?: boolean; // Add props for shadowing
+  size?: number;
+  castShadow?: boolean;
   receiveShadow?: boolean;
 }
 
 const GlassBall: React.FC<GlassBallProps> = ({
   position,
-  size = 3.2, // Default size if not provided
+  size = 3.2,
   castShadow = false,
   receiveShadow = false,
 }) => {

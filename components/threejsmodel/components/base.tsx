@@ -11,7 +11,7 @@ const createBaseWithHole = (
   shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, choice);
   shape.absarc(0, 0, innerRadius, Math.PI * 2, 0, true);
 
-  return shape; // Return the shape instead of geometry
+  return shape;
 };
 
 const Base: React.FC<{
@@ -36,7 +36,6 @@ const Base: React.FC<{
     choice,
   );
 
-  // Extrusion settings
   const extrudeSettings = {
     depth: height,
     bevelEnabled: false,
