@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as THREE from "three";
 
 interface SmallBallsAnimationProps {
@@ -75,63 +75,66 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({
       });
     };
 
-    const animate = () => {
-      requestAnimationFrame(animate);
+    setTimeout(() => {
+      const animate = () => {
+        requestAnimationFrame(animate);
 
-      smallBalls.forEach((ball, i) => {
-        ball.position.add(velocities[i]);
+        smallBalls.forEach((ball, i) => {
+          ball.position.add(velocities[i]);
 
-        const distanceFromCenter = Math.sqrt(
-          ball.position.x ** 2 + ball.position.y ** 2 + ball.position.z ** 2
-        );
-        
-        if (ball.position.y < -2.45 || distanceFromCenter > 2.8) {
-          velocities[i].negate();
-        }
+          const distanceFromCenter = Math.sqrt(
+            ball.position.x ** 2 + ball.position.y ** 2 + ball.position.z ** 2,
+          );
+          console.log(distanceFromCenter);
 
-        if (ball.position.y <= 3.2 || ball.position.y >= -2.45) {
-          ball.position.y += velocities[i].y;
-        }
+          if (ball.position.y < -2.45 || distanceFromCenter > 2.8) {
+            velocities[i].negate();
+          }
 
-        ball.rotation.set(0, 0, 0);
+          if (ball.position.y <= 3.2 || ball.position.y >= -2.45) {
+            ball.position.y += velocities[i].y;
+          }
 
-        if (Array.isArray(ball.material)) {
-          ball.material.forEach((material) => {
-            if (
-              material instanceof THREE.MeshBasicMaterial ||
-              material instanceof THREE.MeshStandardMaterial ||
-              material instanceof THREE.MeshPhongMaterial
-            ) {
-              material.map = textures[i];
-              material.needsUpdate = true;
-            }
-          });
-        } else if (
-          ball.material instanceof THREE.MeshBasicMaterial ||
-          ball.material instanceof THREE.MeshStandardMaterial ||
-          ball.material instanceof THREE.MeshPhongMaterial
-        ) {
-          ball.material.map = textures[i];
-          ball.material.needsUpdate = true;
-        }
-      });
+          ball.rotation.set(0, 0, 0);
 
-      handleCollisions();
-    };
+          if (Array.isArray(ball.material)) {
+            ball.material.forEach((material) => {
+              if (
+                material instanceof THREE.MeshBasicMaterial ||
+                material instanceof THREE.MeshStandardMaterial ||
+                material instanceof THREE.MeshPhongMaterial
+              ) {
+                material.map = textures[i];
+                material.needsUpdate = true;
+              }
+            });
+          } else if (
+            ball.material instanceof THREE.MeshBasicMaterial ||
+            ball.material instanceof THREE.MeshStandardMaterial ||
+            ball.material instanceof THREE.MeshPhongMaterial
+          ) {
+            ball.material.map = textures[i];
+            ball.material.needsUpdate = true;
+          }
+        });
 
-    animate();
+        handleCollisions();
+      };
 
-    const stopAnimationTimeout = setTimeout(() => {
-      smallBalls.forEach((_, i) => {
-        velocities[i].set(0, 0, 0);
-      });
-    }, 10000);
+      animate();
+      const stopAnimationTimeout = setTimeout(() => {
+        smallBalls.forEach((_, i) => {
+          velocities[i].set(0, 0, 0);
+        });
+      }, 10000);
 
-    return () => {
-      clearTimeout(stopAnimationTimeout);
-    };
+      return () => {
+        clearTimeout(stopAnimationTimeout);
+      };
+    }, 1000);
   }, [smallBalls, velocities, textures, camera]);
 
+  velocities;
   return null;
 };
 
