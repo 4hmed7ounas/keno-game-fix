@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 import SmallBallsAnimation from "./components/Animations/smallballsani";
 
+const ballNumbers = 80;
 const createCylinderMesh = (position, args, materialProps) => (
   <mesh position={position}>
     <cylinderGeometry args={args} />
@@ -31,7 +32,7 @@ const cylinderMeshData = [
   { position: [0, 5.23, 0], args: [0.45, 0.45, 0.06, 40] },
 ];
 
-const balls = Array.from({ length: 80 }, (_, index) => index + 1);
+const balls = Array.from({ length: ballNumbers }, (_, index) => index + 1);
 
 const GlassBallWithSmallBalls = ({ cameraRef }) => {
   const [smallBalls, setSmallBalls] = useState<THREE.Mesh[]>([]);
@@ -43,7 +44,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
     const smallBallsArray: THREE.Mesh[] = [];
     const velocitiesArray: THREE.Vector3[] = [];
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < ballNumbers; i++) {
       const velocity = new THREE.Vector3(
         (Math.random() - 0.5) * 0.05,
         (Math.random() - 0.5) * 0.05,
@@ -84,14 +85,50 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * smallBalls.length);
       setMovingBallIndex(randomIndex);
-      // Move the selected small ball to the glass ball's position
+
+      // Move the selected small ball to the mesh (0.7) below the glass ball
       gsap.to(smallBalls[randomIndex].position, {
         x: 0,
-        y: 4.8,
+        y: 4.1, // Target Y position just below the glass ball
         z: 0,
         duration: 1,
+        onComplete: () => {
+          // Move the ball into the glass ball and enlarge its size
+          gsap.to(smallBalls[randomIndex].position, {
+            y: 4.8, // Inside the glass ball
+            duration: 1,
+          });
+          gsap.to(smallBalls[randomIndex].scale, {
+            x: 2,
+            y: 2,
+            z: 2,
+            duration: 1,
+          });
+
+          // Disable any movement animation while the ball is inside the glass ball
+          gsap.to(smallBalls[randomIndex].rotation, {
+            x: 0,
+            y: 0,
+            z: 0,
+            duration: 0, // Reset rotation to face forward
+          });
+
+          // After 5 seconds, move the ball upwards and decrease its size
+          setTimeout(() => {
+            gsap.to(smallBalls[randomIndex].position, {
+              y: 5.9, // Move upward toward the mesh (1.2)
+              duration: 1,
+            });
+            gsap.to(smallBalls[randomIndex].scale, {
+              x: 0.2,
+              y: 0.2,
+              z: 0.2,
+              duration: 1,
+            });
+          }, 10000);
+        },
       });
-    }, 5000);
+    }, 12000); // Adjust interval timing for smooth transitions
 
     return () => clearInterval(interval);
   }, [smallBalls]);
@@ -113,7 +150,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
       <hemisphereLight groundColor={0x444444} intensity={0.5} />
 
       <mesh position={[0, 3.9, 0]}>
-        <cylinderGeometry args={[0.26, 0.26, 0.7, 40]} />
+        <cylinderGeometry args={[0.26, 0.26, 0.8, 40]} />
         <meshPhysicalMaterial
           color={0xffffff}
           metalness={0.5}

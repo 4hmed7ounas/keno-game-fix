@@ -1,51 +1,15 @@
-// import { useEffect } from 'react';
-// import * as THREE from 'three';
-
-// interface SmallBallsAnimationProps {
-//   smallBalls: THREE.Mesh[];
-//   velocities: THREE.Vector3[];
-// }
-
-// const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, velocities }) => {
-//   useEffect(() => {
-//     const animate = () => {
-//       requestAnimationFrame(animate);
-
-//       smallBalls.forEach((ball, i) => {
-//         // Update ball position
-//         ball.position.add(velocities[i]);
-
-//         // Check for collision with the glass ball boundary
-//         const distanceFromCenter = ball.position.length();
-//         const glassBallRadius = 3 - 0.4;
-
-//         if (distanceFromCenter >= glassBallRadius) {
-//           velocities[i].negate(); // Reverse the velocity
-//         }
-
-//         ball.rotation.x += 0.5;
-//         ball.rotation.y += 0.5;
-//       });
-//     };
-
-//     animate(); // Start the animation loop
-//   }, [smallBalls, velocities]);
-
-//   return null; // This component doesn't render anything itself
-// };
-
-// export default SmallBallsAnimation;
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
 
 interface SmallBallsAnimationProps {
   smallBalls: THREE.Mesh[];
   velocities: THREE.Vector3[];
+  smallVelocities: THREE.Vector3[];
   ballNumbers: number[];
+  camera?: THREE.Camera;
 }
 
-const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, velocities, ballNumbers }) => {
-  // Create an array to hold the textures for each ball
+const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, velocities, smallVelocities, ballNumbers, camera }) => {
   const textures = React.useMemo(() => {
     return ballNumbers.map((number) => {
       const canvas = document.createElement('canvas');
@@ -55,9 +19,9 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, v
       if (context) {
         context.fillStyle = 'white'; // Background color
         context.fillRect(0, 0, canvas.width, canvas.height);
-        context.font = 'bold 90px Arial';
+        context.font = 'bold 100px TimesNewRoman';
         context.fillStyle = 'black'; // Text color
-        context.fillText(number.toString(), canvas.width / 5, canvas.height / 3); // Draw number
+        context.fillText(number.toString(), 18, 160); // Draw number
       }
       return new THREE.CanvasTexture(canvas); // Create texture from the canvas
     });
@@ -68,10 +32,8 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, v
       requestAnimationFrame(animate);
 
       smallBalls.forEach((ball, i) => {
-        // Update ball position
         ball.position.add(velocities[i]);
 
-        // Check for collision with the glass ball boundary
         const distanceFromCenter = ball.position.length();
         const glassBallRadius = 3 - 0.4;
 
@@ -79,8 +41,13 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, v
           velocities[i].negate(); // Reverse the velocity
         }
 
-        ball.rotation.x += 0.01;
-        ball.rotation.y += 0.01;
+        // Stop rotation of the ball to keep the number front-facing
+        ball.rotation.set(0, 0, 0); // Prevent rotation of the ball
+
+        // Optional: Make the ball always face the camera (billboarding effect)
+        if (camera) {
+          ball.lookAt(new THREE.Vector3(0, 0, 0)); // Ensure the ball faces the camera
+        }
 
         // Update material texture
         if (Array.isArray(ball.material)) {
@@ -101,7 +68,7 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({ smallBalls, v
     };
 
     animate(); // Start the animation loop
-  }, [smallBalls, velocities, textures]); // Add textures to the dependency array
+  }, [smallBalls, velocities, textures, camera]); // Add camera to the dependency array
 
   return null; // This component doesn't render anything itself
 };
