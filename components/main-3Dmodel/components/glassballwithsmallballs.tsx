@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import GlassBall from "./glassball";
 import Base from "./base";
 import SmallBallsAnimation from "./Animations/smallballsani";
+import GlassBall from "./glassball";
 
 const ballNumbers = 80;
 
@@ -119,9 +119,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
               gsap.to(smallBalls[index].position, {
                 y: 4.8,
                 duration: 0.1,
-                onComplete: ()=>{
-
-                }
+                onComplete: () => {},
               });
               gsap.to(smallBalls[index].scale, {
                 x: 2.2,
@@ -236,7 +234,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
       />
       <Base
         positionY={-2.86}
-        color={0x0FAEE2}
+        color={0x0faee2}
         height={0.25}
         innerRadius={2.5}
         outerRadius={3.5}
@@ -245,7 +243,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
         <React.Fragment key={j}>
           <Base
             positionY={-2.85 - (j + 1) * 0.6 - 0.1 * (j + 1)}
-            color={0x0CC3FF}
+            color={0x0cc3ff}
             height={0.25}
             innerRadius={2.5}
             outerRadius={3.5}
