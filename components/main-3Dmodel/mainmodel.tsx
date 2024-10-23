@@ -16,6 +16,7 @@ const MainModel = () => {
         gl.shadowMap.enabled = true;
       }}
     >
+      
       <GlassBallWithSmallBalls cameraRef={cameraRef} />{" "}
     </Canvas>
   );

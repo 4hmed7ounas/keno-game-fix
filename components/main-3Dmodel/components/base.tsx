@@ -39,7 +39,7 @@ const Base: React.FC<{
   const extrudeSettings = {
     depth: height,
     bevelEnabled: false,
-    curveSegments: 100,
+    curveSegments: 300,
   };
 
   return (

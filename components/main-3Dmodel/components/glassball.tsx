@@ -16,11 +16,10 @@ const GlassBall: React.FC<GlassBallProps> = ({
 }) => {
   return (
     <mesh position={position} castShadow={castShadow} receiveShadow={receiveShadow}>
-      <sphereGeometry args={[size, 64, 64]} />
+      <sphereGeometry args={[size, 128, 128]} />
       <meshPhysicalMaterial
-        color={0xffffff}
         metalness={0.5}
-        roughness={0.08}
+        roughness={0}
         transmission={1}
         ior={5.33}
         transparent={true}
