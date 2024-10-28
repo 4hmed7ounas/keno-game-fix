@@ -11,7 +11,7 @@ const MainModel = () => {
       shadows
       camera={{ position: [0, 0, 150], fov: 5 }}
       onCreated={({ gl, camera }) => {
-        cameraRef.current = camera as THREE.PerspectiveCamera; // Store camera reference with type assertion
+        cameraRef.current = camera as THREE.PerspectiveCamera;
         gl.setSize(window.innerWidth, window.innerHeight);
         gl.shadowMap.enabled = true;
       }}
