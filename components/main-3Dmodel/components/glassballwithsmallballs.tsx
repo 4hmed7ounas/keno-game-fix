@@ -96,11 +96,11 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
       x: is530
         ? 0
         : is768
-          ? -0.4
+          ? -0.5
           : is1024
-            ? -0.6
+            ? -0.75
             : is1440
-              ? -1.4
+              ? -0.85
               : isLargeScreen
                 ? -1
                 : -1, // Adjust x position for large screens
