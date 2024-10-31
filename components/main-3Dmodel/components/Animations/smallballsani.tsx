@@ -24,41 +24,41 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({
   const textures = useMemo(() => {
     return ballNumbers.map((number) => {
       const canvas = document.createElement("canvas");
-      canvas.width = 1024;
-      canvas.height = 1024;
+      canvas.width = 360;
+      canvas.height = 360;
       const context = canvas.getContext("2d");
 
       if (context) {
         context.fillStyle = "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
-        context.font = "bold 200px Arail"; // Smaller font size for four places
+        context.font = "bold 85px Sansarif";
         context.fillStyle = "black";
 
         const positions =
           number >= 1 && number <= 9
             ? [
-                { x: 80, y: 240 },
-                { x: 0, y: 600 },
-                { x: 200, y: 560 },
-                { x: 160, y: 840 },
-                { x: 400, y: 240 },
-                { x: 360, y: 640 },
-                { x: 360, y: 920 },
-                { x: 0, y: 900 },
+                { x: -15, y: 100 },
+                { x: -10, y: 260 },
+                { x: 70, y: 290 },
+                { x: 80, y: 90 },
+                { x: 150, y: 100 },
+                { x: 65, y: 180 }, // center
+                { x: -20, y: 180 },
+                { x: 150, y: 200 },
+                { x: 150, y: 290 },
               ]
             : [
-                { x: 80, y: 240 },
-                { x: -80, y: 600 },
-                { x: 160, y: 560 },
-                { x: 160, y: 840 },
-                { x: 400, y: 240 },
-                { x: 440, y: 640 },
-                { x: 400, y: 860 },
-                { x: -80, y: 900 },
+                { x: -40, y: 100 },
+                { x: 120, y: 280 },
+                { x: -20, y: 290 },
+                { x: 100, y: 90 },
+                { x: 45, y: 190 }, //center
+                { x: 140, y: 180 },
+                { x: -50, y: 200 },
               ];
 
         positions.forEach((pos) => {
-          const rotationAngle = (Math.random() * Math.PI) / 8 - Math.PI / 16; // Rotate between -11.25 and 11.25 degrees
+          const rotationAngle = (Math.random() * Math.PI) / 7 - Math.PI / 16;
           context.save();
           context.translate(pos.x + 20, pos.y + 20);
           context.rotate(rotationAngle);
@@ -183,7 +183,7 @@ const SmallBallsAnimation: React.FC<SmallBallsAnimationProps> = ({
       return () => {
         clearTimeout(stopAnimationTimeout);
       };
-    }, 1000);
+    }, 500);
   }, [smallBalls, velocities, textures, camera]);
 
   return null;

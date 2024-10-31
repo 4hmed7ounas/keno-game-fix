@@ -38,16 +38,16 @@ const cylinderGlassProps = {
 const cylinderMeshData = [
   { position: [0, 3.45, 0], args: [0.45, 0.45, 0.1, 40] },
   { position: [0, 3.32, 0], args: [0.45, 0.45, 0.1, 40] },
-  { position: [0, 4.3, 0], args: [0.45, 0.45, 0.06, 40] },
-  { position: [0, 4.37, 0], args: [0.45, 0.45, 0.06, 40] },
-  { position: [0, 5.3, 0], args: [0.45, 0.45, 0.06, 40] },
-  { position: [0, 5.23, 0], args: [0.45, 0.45, 0.06, 40] },
+  { position: [0, 4.25, 0], args: [0.45, 0.45, 0.06, 40] },
+  { position: [0, 4.32, 0], args: [0.45, 0.45, 0.06, 40] },
+  { position: [0, 5.33, 0], args: [0.45, 0.45, 0.06, 40] },
+  { position: [0, 5.26, 0], args: [0.45, 0.45, 0.06, 40] },
 ];
 
 const cylinderGlassMeshData = [
   { position: [0, 3.9, 0], args: [0.26, 0.26, 0.8, 40] },
   { position: [0, 5.9, 0], args: [0.26, 0.26, 1.3, 40] },
-  { position: [0, 5.6, 0], args: [0.4, 0.4, 0.06, 40] },
+  { position: [0, 5.6, 0], args: [0.4, 0.4, 0.08, 40] },
   { position: [0, 5.9, 0], args: [0.4, 0.4, 0.06, 40] },
   { position: [0, 6.2, 0], args: [0.4, 0.4, 0.06, 40] },
   { position: [0, 6.5, 0], args: [0.4, 0.4, 0.06, 40] },
@@ -86,10 +86,26 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
   }, []);
 
   const startZoomAnimation = () => {
+    const is530 = window.matchMedia("(max-width: 530px)").matches;
+    const is768 = window.matchMedia("(max-width: 768px)").matches;
+    const is1024 = window.matchMedia("(max-width: 1024px)").matches;
+    const is1440 = window.matchMedia("(max-width: 1440px)").matches;
+    const isLargeScreen = window.matchMedia("(min-width: 1440px)").matches;
+
     gsap.to(cameraRef.current.position, {
-      x: -1,
+      x: is530
+        ? 0
+        : is768
+          ? -0.4
+          : is1024
+            ? -0.6
+            : is1440
+              ? -1.4
+              : isLargeScreen
+                ? -1
+                : -1, // Adjust x position for large screens
       y: 4.8,
-      z: 18,
+      z: is530 ? 22 : is768 ? 20 : 18, // Adjust z position for large screens
       duration: 2,
     });
   };
@@ -102,6 +118,64 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
     return () => clearTimeout(zoomTimeout);
   }, [cameraRef]);
 
+  // useEffect(() => {
+  //   const animateBall = (index) => {
+  //     gsap.to(smallBalls[index].position, {
+  //       x: 0,
+  //       y: 3.2,
+  //       z: 0,
+  //       duration: 1,
+  //       onComplete: () => {
+  //         gsap.to(smallBalls[index].position, {
+  //           x: 0,
+  //           y: 4.1,
+  //           z: 0,
+  //           duration: 0.1,
+  //           onComplete: () => {
+  //             gsap.to(smallBalls[index].position, {
+  //               y: 4.8,
+  //               duration: 0.1,
+  //               onComplete: () => {},
+  //             });
+  //             gsap.to(smallBalls[index].scale, {
+  //               x: 2.2,
+  //               y: 2.2,
+  //               z: 2,
+  //               duration: 0.05,
+  //               onComplete: () => {
+  //                 gsap.to(smallBalls[index].scale, {
+  //                   x: 2.6,
+  //                   y: 2.6,
+  //                   z: 2,
+  //                   duration: 0.1,
+  //                 });
+  //                 setTimeout(() => {
+  //                   gsap.to(smallBalls[index].position, {
+  //                     y: 5.9,
+  //                     duration: 0.5,
+  //                   });
+  //                   gsap.to(smallBalls[index].scale, {
+  //                     x: 0,
+  //                     y: 0,
+  //                     z: 0,
+  //                     duration: 0.5,
+  //                   });
+  //                 }, 3000);
+  //               },
+  //             });
+  //           },
+  //         });
+  //       },
+  //     });
+  //   };
+
+  //   const interval = setInterval(() => {
+  //     const randomIndex = Math.floor(Math.random() * smallBalls.length);
+  //     animateBall(randomIndex);
+  //   }, 7000);
+
+  //   return () => clearInterval(interval);
+  // }, [smallBalls]);
   useEffect(() => {
     const animateBall = (index) => {
       gsap.to(smallBalls[index].position, {
@@ -119,32 +193,56 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
               gsap.to(smallBalls[index].position, {
                 y: 4.8,
                 duration: 0.1,
-                onComplete: () => {},
-              });
-              gsap.to(smallBalls[index].scale, {
-                x: 2.2,
-                y: 2.2,
-                z: 2,
-                duration: 0.05,
                 onComplete: () => {
-                  gsap.to(smallBalls[index].scale, {
-                    x: 2.6,
-                    y: 2.6,
-                    z: 2,
+                  gsap.to(smallBalls[index].position, {
+                    y: 4.7,
                     duration: 0.1,
+                    ease: "bounce.out",
                   });
-                  setTimeout(() => {
-                    gsap.to(smallBalls[index].position, {
-                      y: 5.9,
-                      duration: 0.5,
-                    });
-                    gsap.to(smallBalls[index].scale, {
-                      x: 0,
-                      y: 0,
-                      z: 0,
-                      duration: 0.5,
-                    });
-                  }, 3000);
+                  gsap.to(smallBalls[index].position, {
+                    y: 4.8,
+                    duration: 0.1,
+                    delay: 0.1,
+                    ease: "bounce.out",
+                  });
+                  gsap.to(smallBalls[index].position, {
+                    y: 4.7,
+                    duration: 0.1,
+                    delay: 0.1,
+                    ease: "bounce.out",
+                  });
+                  gsap.to(smallBalls[index].position, {
+                    y: 4.8,
+                    duration: 0.1,
+                    delay: 0.1,
+                    ease: "bounce.out",
+                  });
+                  gsap.to(smallBalls[index].scale, {
+                    x: 2.2,
+                    y: 2.2,
+                    z: 2,
+                    duration: 0.05,
+                    onComplete: () => {
+                      gsap.to(smallBalls[index].scale, {
+                        x: 2.6,
+                        y: 2.6,
+                        z: 2,
+                        duration: 0.1,
+                      });
+                      setTimeout(() => {
+                        gsap.to(smallBalls[index].position, {
+                          y: 5.9,
+                          duration: 0.5,
+                        });
+                        gsap.to(smallBalls[index].scale, {
+                          x: 0,
+                          y: 0,
+                          z: 0,
+                          duration: 0.5,
+                        });
+                      }, 3000);
+                    },
+                  });
                 },
               });
             },
@@ -156,7 +254,7 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * smallBalls.length);
       animateBall(randomIndex);
-    }, 7000); // Adjust the interval for ball movement
+    }, 7000);
 
     return () => clearInterval(interval);
   }, [smallBalls]);
@@ -174,7 +272,6 @@ const GlassBallWithSmallBalls = ({ cameraRef }) => {
       <pointLight position={[0, 0, 0]} intensity={2} distance={2} decay={1} />
       <pointLight position={[5, 5, 5]} intensity={2} distance={2} decay={1} />
       <pointLight position={[5, 5, 0]} intensity={2} distance={2} decay={1} />
-      <hemisphereLight groundColor={0x444444} intensity={1} />
 
       {cylinderGlassMeshData.map((data, index) =>
         createCylinderMesh(data.position, data.args, cylinderGlassProps),
